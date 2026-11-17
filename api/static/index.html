@@ -4,142 +4,198 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Simulasi Risiko Kredit</title>
+<meta name="description" content="Simulasi prediksi risiko gagal bayar dengan model LightGBM pada data Home Credit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f6f7f9; --card:#fff; --text:#1c2430; --muted:#5d6978; --line:#dfe3e8;
-  --accent:#1f5fbf; --accent-text:#fff;
-  --A:#b42318; --B:#b54708; --C:#8a6d00; --D:#0a7a4b;
-  --Abg:#fdecea; --Bbg:#fdf0e1; --Cbg:#fbf3d0; --Dbg:#e4f5ec;
+  --backdrop:#e4eaf1; --paper:#fbfcfd; --field:#eef2f7; --line:#d6dde6;
+  --text:#0f1b2b; --muted:#5a6778; --accent:#4350e0; --accent-ink:#fff;
+  --ink:#0e1a2b; --ink-2:#16263d; --ink-text:#e8eef7; --ink-muted:#93a3b8; --ink-line:#26384f;
+  --bar:#8ea2ff;
+  --tD:#37c98b; --tC:#e6c84a; --tB:#f39a4a; --tA:#f2655a;
+  --warn-bg:#3a2d12; --warn-text:#f5cf84;
+  --font:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#12161c; --card:#1a2029; --text:#e6e9ee; --muted:#9aa5b4; --line:#2a323d;
-    --accent:#6ea2f0; --accent-text:#0b1220;
-    --A:#ff8a80; --B:#ffb870; --C:#e8cd5a; --D:#6fd6a3;
-    --Abg:#3a1f1d; --Bbg:#3a2a18; --Cbg:#37300f; --Dbg:#163326;
-  }
+  :root{ --backdrop:#080e16; --paper:#121a26; --field:#1a2433; --line:#26334a;
+         --text:#e8eef7; --muted:#97a5b9; --accent:#8b97ff; --accent-ink:#0b1020;
+         --ink:#0c1522; --ink-2:#142238; }
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-.wrap{max-width:1040px;margin:0 auto;padding:24px 16px 48px}
-h1{font-size:22px;margin:0 0 4px}
-.sub{color:var(--muted);margin:0 0 20px}
-.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;align-items:start}
-@media (max-width:820px){.grid{grid-template-columns:1fr}}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
-fieldset{border:0;margin:0 0 14px;padding:0}
-legend{font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:8px;padding:0}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media (max-width:480px){.row{grid-template-columns:1fr}}
-label{display:block;font-size:13px;color:var(--muted)}
-input,select{width:100%;margin-top:3px;padding:8px 9px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);font:inherit}
-input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-button{font:inherit;border-radius:7px;padding:8px 12px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer}
-button.primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent);font-weight:600}
-button:disabled{opacity:.6;cursor:wait}
-.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
-.result-empty{color:var(--muted)}
-.prob{font-size:40px;font-weight:700;line-height:1.1}
-.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:600;font-size:13px;border:1px solid currentColor}
-.t-A{color:var(--A);background:var(--Abg)} .t-B{color:var(--B);background:var(--Bbg)}
-.t-C{color:var(--C);background:var(--Cbg)} .t-D{color:var(--D);background:var(--Dbg)}
-.decision{margin:10px 0;font-weight:600}
-.scale{position:relative;height:12px;display:flex;margin:14px 0 4px}
-.scale span{display:block;height:100%}
-.scale span:first-child{border-radius:6px 0 0 6px}
-.scale span:nth-child(4){border-radius:0 6px 6px 0}
-.marker{position:absolute;top:-4px;width:3px;height:20px;background:var(--text);border-radius:2px}
-.legend{display:flex;font-size:11px;color:var(--muted)}
-.legend span{text-align:center;overflow:hidden;white-space:nowrap}
-ul.reasons{padding-left:18px;margin:6px 0}
-ul.reasons li{margin:4px 0}
-.small{font-size:12px;color:var(--muted)}
-.warn{background:var(--Bbg);color:var(--B);padding:8px 10px;border-radius:7px;font-size:13px;margin:10px 0}
-.err{background:var(--Abg);color:var(--A);padding:8px 10px;border-radius:7px;font-size:13px}
-a{color:var(--accent)}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--backdrop);color:var(--text);font:400 16px/1.5 var(--font);font-variant-numeric:tabular-nums}
+.page{max-width:1120px;margin:0 auto;padding:36px 20px 96px}
+header h1{font-size:clamp(30px,5vw,48px);line-height:1.05;letter-spacing:-.025em;font-weight:700;margin:0 0 10px;max-width:16ch}
+header p{margin:0;color:var(--muted);max-width:56ch}
+.starts{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:24px 0 20px}
+.starts span{color:var(--muted);font-size:14px;margin-right:4px}
+button{font:inherit;cursor:pointer}
+.chip{border:1px solid var(--line);background:var(--paper);color:var(--text);border-radius:999px;padding:7px 14px;font-size:14px;font-weight:550;transition:border-color .15s,background .15s}
+.chip:hover{border-color:var(--accent)}
+.chip.quiet{background:transparent;border-color:transparent;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:24px;align-items:start}
+.sheet{background:var(--paper);border-radius:18px;padding:8px 28px 12px;border:1px solid var(--line)}
+section.group{padding:22px 0;border-bottom:1px solid var(--line)}
+section.group:last-child{border-bottom:0}
+.group h2{font-size:17px;font-weight:650;margin:0 0 2px;letter-spacing:-.01em}
+.group .why{margin:0 0 14px;font-size:13.5px;color:var(--muted)}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+label.f{display:block;font-size:13px;color:var(--muted)}
+.f input,.f select{display:block;width:100%;height:42px;margin-top:4px;padding:0 12px;border:1px solid transparent;border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:15px}
+.f input:focus,.f select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.slider{display:grid;grid-template-columns:70px 1fr 78px;align-items:center;gap:12px;margin-bottom:10px}
+.slider .nm{font-size:14px}
+.slider input[type=range]{width:100%;accent-color:var(--accent);margin:0}
+.slider input[type=number]{height:38px;margin:0;padding:0 8px;text-align:right;border:1px solid transparent;border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:15px;width:100%}
+.slider input[type=number]:focus{outline:none;border-color:var(--accent)}
+
+.console{position:sticky;top:20px;background:linear-gradient(180deg,var(--ink-2),var(--ink) 55%);color:var(--ink-text);border-radius:22px;padding:26px 24px 20px;border:1px solid var(--ink-line)}
+.gauge{width:100%;max-width:340px;display:block;margin:0 auto}
+.seg{fill:none;stroke-width:16;stroke-linecap:butt}
+.needle{transform-origin:150px 150px;transition:transform .7s cubic-bezier(.2,.9,.25,1),opacity .3s;transform:rotate(-90deg);opacity:0}
+.needle.on{opacity:1}
+.readout{text-align:center;margin-top:10px}
+.pct{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.pct small{font-size:26px;font-weight:600;margin-left:2px;color:var(--ink-muted)}
+.tier{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:5px 14px 5px 10px;border-radius:999px;background:rgba(255,255,255,.07);font-weight:600;font-size:15px}
+.tier[hidden]{display:none}
+.tier i{width:10px;height:10px;border-radius:50%;background:var(--ink-muted)}
+.verdict{text-align:center;margin:14px 0 2px;font-size:17px;font-weight:600}
+.thresh{text-align:center;color:var(--ink-muted);font-size:13px}
+.hr{height:1px;background:var(--ink-line);margin:20px 0 16px}
+.console h3{font-size:15px;font-weight:650;margin:0 0 12px}
+.r{margin-bottom:14px}
+.r-top{display:flex;justify-content:space-between;gap:12px;font-size:14.5px;font-weight:550}
+.r-top b{font-weight:650;color:var(--bar)}
+.track{height:7px;border-radius:4px;background:rgba(255,255,255,.08);margin:6px 0 4px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--bar);border-radius:4px;transition:width .5s ease}
+.r-sub{font-size:12.5px;color:var(--ink-muted);overflow-wrap:anywhere}
+.none{color:var(--ink-muted);font-size:14px}
+.warn{background:var(--warn-bg);color:var(--warn-text);border-radius:10px;padding:10px 12px;font-size:13px;margin:14px 0 0}
+.fine{font-size:12.5px;color:var(--ink-muted);margin:12px 0 0}
+details{margin-top:14px;border-top:1px solid var(--ink-line);padding-top:12px}
+summary{cursor:pointer;font-size:13.5px;color:var(--ink-muted)}
+pre{margin:10px 0 0;max-height:240px;overflow:auto;background:rgba(0,0,0,.28);padding:12px;border-radius:10px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#cfe0ff;white-space:pre-wrap;word-break:break-word}
+.empty{text-align:center;color:var(--ink-muted);margin:6px 0 4px}
+.err{background:#3a1b19;color:#ffb4ab;border-radius:10px;padding:10px 12px;font-size:13.5px;margin-top:12px}
+footer{margin-top:28px;font-size:13px;color:var(--muted);max-width:80ch}
+footer a{color:var(--accent)}
+#mini{display:none}
+
+@media (max-width:860px){
+  .layout{grid-template-columns:1fr}
+  .console{position:static;order:-1}
+  .fields{grid-template-columns:1fr}
+  .sheet{padding:4px 18px 8px}
+  #mini{position:fixed;left:12px;right:12px;bottom:12px;z-index:5;background:var(--ink);color:var(--ink-text);border:1px solid var(--ink-line);border-radius:14px;padding:10px 16px;align-items:center;justify-content:space-between;font-weight:600}
+  #mini.on{display:flex}
+}
+@media (max-width:480px){ .slider{grid-template-columns:58px 1fr 70px} }
+@media (prefers-reduced-motion: reduce){ .needle,.track i{transition:none} }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Simulasi Risiko Kredit</h1>
-  <p class="sub">Model LightGBM pada data Home Credit Default Risk. Isi data pemohon, lihat probabilitas gagal bayar, kelompok risiko, dan faktor pendorongnya.</p>
+<div class="page">
+  <header>
+    <h1>Seberapa besar risiko gagal bayarnya?</h1>
+    <p>Ubah data pemohon dan lihat perhitungan model secara langsung. Model LightGBM dilatih pada 307.511 pengajuan kredit Home Credit.</p>
+  </header>
 
-  <div class="grid">
-    <form id="f" class="card" autocomplete="off">
-      <div class="presets">
-        <button type="button" data-preset="low">Contoh risiko rendah</button>
-        <button type="button" data-preset="high">Contoh risiko tinggi</button>
-        <button type="button" data-preset="clear">Kosongkan</button>
-      </div>
+  <div class="starts">
+    <span>Mulai dari</span>
+    <button type="button" class="chip" data-preset="low">Contoh risiko rendah</button>
+    <button type="button" class="chip" data-preset="mid">Contoh risiko menengah</button>
+    <button type="button" class="chip" data-preset="high">Contoh risiko tinggi</button>
+    <button type="button" class="chip quiet" data-preset="clear">Kosongkan</button>
+  </div>
 
-      <fieldset><legend>Pinjaman</legend>
-        <div class="row">
-          <label>Jenis kontrak
-            <select name="name_contract_type"><option value="">(kosong)</option><option>Cash loans</option><option>Revolving loans</option></select></label>
-          <label>Jumlah kredit<input type="number" step="any" min="0" name="amt_credit"></label>
-          <label>Cicilan per periode (annuity)<input type="number" step="any" min="0" name="amt_annuity"></label>
-          <label>Harga barang<input type="number" step="any" min="0" name="amt_goods_price"></label>
+  <div class="layout">
+    <form id="f" class="sheet" autocomplete="off" onsubmit="return false">
+      <section class="group">
+        <h2>Pinjaman yang diajukan</h2>
+        <p class="why">Besar kredit dibanding harga barang dan penghasilan memengaruhi risiko.</p>
+        <div class="fields">
+          <label class="f">Jenis kontrak
+            <select name="name_contract_type"><option value="">Belum dipilih</option><option>Cash loans</option><option>Revolving loans</option></select></label>
+          <label class="f">Jumlah kredit<input type="number" inputmode="decimal" step="any" min="0" name="amt_credit"></label>
+          <label class="f">Cicilan per periode<input type="number" inputmode="decimal" step="any" min="0" name="amt_annuity"></label>
+          <label class="f">Harga barang<input type="number" inputmode="decimal" step="any" min="0" name="amt_goods_price"></label>
         </div>
-      </fieldset>
+      </section>
 
-      <fieldset><legend>Pemohon</legend>
-        <div class="row">
-          <label>Penghasilan total (per tahun)<input type="number" step="any" min="0" name="amt_income_total"></label>
-          <label>Umur (tahun)<input type="number" step="any" min="18" max="100" name="age_years"></label>
-          <label>Lama bekerja (tahun)<input type="number" step="any" min="0" max="80" name="years_employed"></label>
-          <label>Jumlah anggota keluarga<input type="number" step="1" min="1" name="cnt_fam_members"></label>
-          <label>Pendidikan
-            <select name="name_education_type"><option value="">(kosong)</option>
+      <section class="group">
+        <h2>Pemohon</h2>
+        <p class="why">Penghasilan dihitung per tahun, umur dan masa kerja dalam tahun.</p>
+        <div class="fields">
+          <label class="f">Penghasilan total<input type="number" inputmode="decimal" step="any" min="0" name="amt_income_total"></label>
+          <label class="f">Umur<input type="number" inputmode="decimal" step="any" min="18" max="100" name="age_years"></label>
+          <label class="f">Lama bekerja<input type="number" inputmode="decimal" step="any" min="0" max="80" name="years_employed"></label>
+          <label class="f">Anggota keluarga<input type="number" inputmode="numeric" step="1" min="1" name="cnt_fam_members"></label>
+          <label class="f">Pendidikan
+            <select name="name_education_type"><option value="">Belum dipilih</option>
               <option>Lower secondary</option><option>Secondary / secondary special</option>
               <option>Incomplete higher</option><option>Higher education</option><option>Academic degree</option></select></label>
-          <label>Jenis penghasilan
-            <select name="name_income_type"><option value="">(kosong)</option>
+          <label class="f">Jenis penghasilan
+            <select name="name_income_type"><option value="">Belum dipilih</option>
               <option>Working</option><option>Commercial associate</option><option>State servant</option>
               <option>Pensioner</option><option>Unemployed</option><option>Student</option><option>Businessman</option></select></label>
         </div>
-      </fieldset>
+      </section>
 
-      <fieldset><legend>Skor kredit eksternal (0 sampai 1)</legend>
-        <div class="row">
-          <label>Skor 1<input type="number" step="0.01" min="0" max="1" name="ext_source_1"></label>
-          <label>Skor 2<input type="number" step="0.01" min="0" max="1" name="ext_source_2"></label>
-          <label>Skor 3<input type="number" step="0.01" min="0" max="1" name="ext_source_3"></label>
+      <section class="group">
+        <h2>Skor kredit eksternal</h2>
+        <p class="why">Skor dari pihak ketiga antara 0 dan 1. Makin rendah, makin berisiko. Ini faktor terkuat model, coba geser dan lihat jarum bergerak.</p>
+        <div class="slider"><span class="nm">Skor 1</span><input type="range" min="0" max="1" step="0.01" data-for="ext_source_1" aria-label="Skor 1"><input type="number" step="0.01" min="0" max="1" name="ext_source_1" aria-label="Nilai skor 1"></div>
+        <div class="slider"><span class="nm">Skor 2</span><input type="range" min="0" max="1" step="0.01" data-for="ext_source_2" aria-label="Skor 2"><input type="number" step="0.01" min="0" max="1" name="ext_source_2" aria-label="Nilai skor 2"></div>
+        <div class="slider"><span class="nm">Skor 3</span><input type="range" min="0" max="1" step="0.01" data-for="ext_source_3" aria-label="Skor 3"><input type="number" step="0.01" min="0" max="1" name="ext_source_3" aria-label="Nilai skor 3"></div>
+      </section>
+
+      <section class="group">
+        <h2>Riwayat kredit</h2>
+        <p class="why">Boleh dikosongkan. Kolom kosong dianggap pemohon tidak punya riwayat itu.</p>
+        <div class="fields">
+          <label class="f">Cicilan terlambat setahun terakhir<input type="number" inputmode="numeric" step="1" min="0" name="inst_n_late_last_year"></label>
+          <label class="f">Pengajuan sebelumnya ditolak<input type="number" inputmode="numeric" step="1" min="0" name="prev_n_refused"></label>
+          <label class="f">Rasio utang terhadap kredit di lembaga lain<input type="number" inputmode="decimal" step="any" min="0" name="bureau_debt_credit_ratio"></label>
+          <label class="f">Total tunggakan di lembaga lain<input type="number" inputmode="decimal" step="any" min="0" name="bureau_overdue_sum"></label>
         </div>
-      </fieldset>
-
-      <fieldset><legend>Riwayat kredit (opsional)</legend>
-        <div class="row">
-          <label>Cicilan terlambat, setahun terakhir (kali)<input type="number" step="1" min="0" name="inst_n_late_last_year"></label>
-          <label>Pengajuan sebelumnya ditolak (kali)<input type="number" step="1" min="0" name="prev_n_refused"></label>
-          <label>Rasio utang terhadap kredit di lembaga lain<input type="number" step="any" min="0" name="bureau_debt_credit_ratio"></label>
-          <label>Total tunggakan di lembaga lain<input type="number" step="any" min="0" name="bureau_overdue_sum"></label>
-        </div>
-        <p class="hint">Kolom yang dikosongkan dianggap "tidak ada data", dan model memperlakukannya sebagai nasabah tanpa riwayat tersebut.</p>
-      </fieldset>
-
-      <button class="primary" type="submit" id="go">Hitung risiko</button>
+      </section>
     </form>
 
-    <div class="card" id="out" aria-live="polite">
-      <div class="result-empty">Hasil akan tampil di sini. Coba tombol contoh di kiri atas.</div>
-    </div>
+    <aside class="console" aria-live="polite" aria-label="Hasil prediksi">
+      <svg class="gauge" viewBox="0 0 300 166" role="img" aria-label="Skala risiko dari rendah ke sangat tinggi">
+        <g id="arcs"></g>
+        <g class="needle" id="needle"><line x1="150" y1="150" x2="150" y2="42" stroke="#e8eef7" stroke-width="3" stroke-linecap="round"/><circle cx="150" cy="150" r="8" fill="#e8eef7"/></g>
+      </svg>
+      <div class="readout">
+        <div class="pct" id="pct">&ndash;</div>
+        <span class="tier" id="tier" hidden><i></i><span></span></span>
+      </div>
+      <div id="body"><p class="empty">Isi data di samping atau pilih salah satu contoh untuk melihat hasilnya.</p></div>
+    </aside>
   </div>
 
-  <p class="small" style="margin-top:20px">
-    Ini demo portofolio, bukan alat keputusan kredit. Keputusan memakai asumsi finansial ilustrasi (untung 10%, rugi 60%), dan faktor risiko menjelaskan perilaku model, bukan sebab-akibat.
-    Form ini hanya mengisi sebagian dari 164 fitur model. Dokumentasi API: <a href="/docs">/docs</a>.
-  </p>
+  <footer>
+    Ini demo portofolio, bukan alat keputusan kredit. Keputusan memakai asumsi finansial ilustrasi (untung 10%, rugi 60% dari kredit), dan faktor risiko menjelaskan perilaku model, bukan sebab-akibat. Form ini hanya mengisi sebagian dari 164 fitur model. Dokumentasi API ada di <a href="/docs">/docs</a>.
+  </footer>
 </div>
+<div id="mini" aria-hidden="true"><span id="mini-p"></span><span id="mini-t"></span></div>
 
 <script>
 const PRESETS = {
-  low: {name_contract_type:"Cash loans",amt_income_total:270000,amt_credit:400000,amt_annuity:18000,amt_goods_price:400000,
-        age_years:43.8,years_employed:9.6,cnt_fam_members:2,name_education_type:"Higher education",name_income_type:"Working",
-        ext_source_1:0.7,ext_source_2:0.75,ext_source_3:0.72},
+  low:{name_contract_type:"Cash loans",amt_income_total:270000,amt_credit:400000,amt_annuity:18000,amt_goods_price:400000,
+       age_years:43.8,years_employed:9.6,cnt_fam_members:2,name_education_type:"Higher education",name_income_type:"Working",
+       ext_source_1:0.7,ext_source_2:0.75,ext_source_3:0.72},
+  mid:{name_contract_type:"Cash loans",amt_income_total:150000,amt_credit:500000,amt_annuity:25000,amt_goods_price:450000,
+       age_years:35,years_employed:4,cnt_fam_members:3,name_education_type:"Secondary / secondary special",name_income_type:"Working",
+       ext_source_1:0.4,ext_source_2:0.45,ext_source_3:0.4},
   high:{name_contract_type:"Cash loans",amt_income_total:90000,amt_credit:900000,amt_annuity:45000,amt_goods_price:700000,
-        age_years:26,years_employed:0.55,cnt_fam_members:4,name_education_type:"Secondary / secondary special",name_income_type:"Working",
-        ext_source_1:0.1,ext_source_2:0.15,ext_source_3:0.12,inst_n_late_last_year:5,prev_n_refused:2}
+       age_years:26,years_employed:0.55,cnt_fam_members:4,name_education_type:"Secondary / secondary special",name_income_type:"Working",
+       ext_source_1:0.1,ext_source_2:0.15,ext_source_3:0.12,inst_n_late_last_year:5,prev_n_refused:2}
 };
 const LABELS = {
   "ext_source (skor kredit eksternal)":"Skor kredit eksternal rendah",
@@ -151,69 +207,118 @@ const LABELS = {
   age_years:"Umur muda", employed_years:"Masa kerja singkat", name_education_type:"Tingkat pendidikan",
   name_income_type:"Jenis penghasilan", amt_goods_price:"Harga barang", amt_credit:"Jumlah kredit"
 };
-const f = document.getElementById("f"), out = document.getElementById("out"), go = document.getElementById("go");
-let cuts = null;
+const TIERS = [["D","Rendah","var(--tD)"],["C","Sedang","var(--tC)"],["B","Tinggi","var(--tB)"],["A","Sangat tinggi","var(--tA)"]];
+const f = document.getElementById("f");
+const $ = id => document.getElementById(id);
+let cuts = {D_max:0.027, C_max:0.082, B_max:0.19}, seq = 0, timer = null;
 
 fetch("/model-info").then(r=>r.json()).then(m=>{cuts=m.tier_cutoffs;}).catch(()=>{});
 
-function fill(p){ f.reset(); for(const [k,v] of Object.entries(p)){ if(f.elements[k]) f.elements[k].value=v; } }
-document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>{
-  const k=b.dataset.preset; if(k==="clear"){f.reset();out.innerHTML='<div class="result-empty">Hasil akan tampil di sini.</div>';} else {fill(PRESETS[k]); f.requestSubmit();}
-}));
+/* skala jarum: tiap kelompok mendapat seperempat busur, posisi di dalamnya linear antar batas kelompok */
+function needlePos(p){
+  const b=[0,cuts.D_max,cuts.C_max,cuts.B_max,Math.max(0.5,cuts.B_max+0.1)];
+  let i=0; while(i<3 && p>b[i+1]) i++;
+  const frac=Math.min(1,Math.max(0,(p-b[i])/(b[i+1]-b[i])));
+  return (i+frac)/4;
+}
+(function drawArcs(){
+  const cx=150, cy=150, r=118, gap=0.035; let h="";
+  TIERS.forEach((t,i)=>{
+    const a1=Math.PI-i*Math.PI/4-gap, a2=Math.PI-(i+1)*Math.PI/4+gap;
+    const x1=cx+r*Math.cos(a1), y1=cy-r*Math.sin(a1), x2=cx+r*Math.cos(a2), y2=cy-r*Math.sin(a2);
+    h+=`<path class="seg" d="M${x1.toFixed(2)} ${y1.toFixed(2)} A${r} ${r} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)}" stroke="${t[2]}"/>`;
+    const am=Math.PI-(i+0.5)*Math.PI/4, lx=cx+(r+0)*Math.cos(am), ly=cy-(r+0)*Math.sin(am);
+    h+=`<text x="${(cx+(r-28)*Math.cos(am)).toFixed(1)}" y="${(cy-(r-28)*Math.sin(am)+4).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="650" fill="${t[2]}">${t[0]}</text>`;
+  });
+  $("arcs").innerHTML=h;
+})();
 
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
-function fmt(v){return typeof v==="number" ? (Number.isInteger(v)?v:v.toFixed(3).replace(/0+$/,"").replace(/\.$/,"")) : esc(v);}
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const num = v => typeof v==="number" ? v.toLocaleString("id-ID",{maximumFractionDigits:3}) : esc(v);
 
 function buildPayload(){
-  const feats = {};
+  const feats={};
   for(const el of f.elements){
     if(!el.name || el.value==="") continue;
-    const isNum = el.type==="number"; feats[el.name] = isNum ? Number(el.value) : el.value;
+    feats[el.name] = el.type==="number" ? Number(el.value) : el.value;
   }
-  if("age_years" in feats){ feats.days_birth = -Math.round(feats.age_years*365.25); delete feats.age_years; }
-  if("years_employed" in feats){ feats.days_employed = -Math.round(feats.years_employed*365.25); delete feats.years_employed; }
-  return {features: feats};
+  if("age_years" in feats){ feats.days_birth=-Math.round(feats.age_years*365.25); delete feats.age_years; }
+  if("years_employed" in feats){ feats.days_employed=-Math.round(feats.years_employed*365.25); delete feats.years_employed; }
+  return {features:feats};
 }
 
-function render(r){
-  const pct = (r.default_probability*100).toFixed(1);
-  const names = {A:"Sangat tinggi",B:"Tinggi",C:"Sedang",D:"Rendah"};
-  const dec = r.decision==="approve" ? "Disetujui menurut kebijakan model" : "Perlu tinjauan manual atau ditolak";
-  let scale = "";
-  if(cuts){
-    const max = 0.4, w = x=>Math.min(x,max)/max*100;
-    const segs = [[0,cuts.D_max,"var(--D)"],[cuts.D_max,cuts.C_max,"var(--C)"],[cuts.C_max,cuts.B_max,"var(--B)"],[cuts.B_max,max,"var(--A)"]];
-    scale = '<div class="scale">'+segs.map(s=>`<span style="width:${w(s[1])-w(s[0])}%;background:${s[2]}"></span>`).join("")+
-      `<i class="marker" style="left:calc(${w(r.default_probability)}% - 1px)"></i></div>
-       <div class="legend">`+segs.map((s,i)=>`<span style="width:${w(s[1])-w(s[0])}%">${"DCBA"[i]}</span>`).join("")+`</div>
-       <div class="small">Skala sampai 40%; di atas itu penanda berada di ujung kanan.</div>`;
-  }
-  const reasons = r.top_risk_factors.length ? '<ul class="reasons">'+r.top_risk_factors.map(x=>{
-    const v = typeof x.value==="object" && x.value!==null
-      ? Object.entries(x.value).map(([k,val])=>`${esc(k)}: ${fmt(val)}`).join(", ") : fmt(x.value);
-    return `<li><strong>${esc(LABELS[x.feature]||x.feature)}</strong><br><span class="small">${v} (kontribusi ${x.contribution_log_odds} log-odds)</span></li>`;
-  }).join("")+"</ul>" : '<p class="small">Tidak ada faktor yang menaikkan risiko dari data yang diisi.</p>';
-  out.innerHTML = `
-    <div class="small">Probabilitas gagal bayar</div>
-    <div class="prob">${pct}%</div>
-    <span class="badge t-${r.risk_tier}">Kelompok ${r.risk_tier}: ${names[r.risk_tier]}</span>
-    <div class="decision">${dec} <span class="small">(ambang ${(r.decision_threshold*100).toFixed(1)}%)</span></div>
-    ${scale}
-    <h3 style="font-size:14px;margin:16px 0 0">Faktor yang paling menaikkan risiko</h3>${reasons}
+function reset(){
+  $("needle").classList.remove("on"); $("needle").style.transform="rotate(-90deg)";
+  $("pct").innerHTML="&ndash;"; $("tier").hidden=true;
+  $("body").innerHTML='<p class="empty">Isi data di samping atau pilih salah satu contoh untuk melihat hasilnya.</p>';
+  $("mini").classList.remove("on");
+}
+
+function render(r, payload){
+  const p=r.default_probability, ti=TIERS.findIndex(t=>t[0]===r.risk_tier), t=TIERS[ti];
+  $("needle").classList.add("on");
+  $("needle").style.transform=`rotate(${-90+180*needlePos(p)}deg)`;
+  const pct=(p*100).toLocaleString("id-ID",{minimumFractionDigits:1,maximumFractionDigits:1});
+  $("pct").innerHTML=`${pct}<small>%</small>`;
+  const tier=$("tier"); tier.hidden=false; tier.querySelector("i").style.background=t[2];
+  tier.querySelector("span").textContent=`Kelompok ${t[0]}: ${t[1]}`;
+  const ok=r.decision==="approve";
+  const max=Math.max(...r.top_risk_factors.map(x=>x.contribution_log_odds),0.0001);
+  const reasons=r.top_risk_factors.length ? r.top_risk_factors.map(x=>{
+    const sub=(x.value!==null && typeof x.value==="object")
+      ? Object.entries(x.value).map(([k,v])=>`${esc(k)} ${num(v)}`).join(", ") : num(x.value);
+    return `<div class="r"><div class="r-top"><span>${esc(LABELS[x.feature]||x.feature)}</span><b>+${x.contribution_log_odds.toLocaleString("id-ID")}</b></div>
+      <div class="track"><i style="width:${Math.max(4,x.contribution_log_odds/max*100)}%"></i></div><div class="r-sub">${sub}</div></div>`;
+  }).join("") : '<p class="none">Tidak ada faktor dari data yang diisi yang menaikkan risiko.</p>';
+  $("body").innerHTML=`
+    <p class="verdict">${ok?"Layak disetujui":"Perlu ditinjau atau ditolak"}</p>
+    <p class="thresh">Ambang keputusan ${(r.decision_threshold*100).toLocaleString("id-ID",{maximumFractionDigits:1})}%</p>
+    <div class="hr"></div>
+    <h3>Faktor yang paling menaikkan risiko</h3>${reasons}
+    <p class="fine">Panjang batang menunjukkan pengaruh pada skor model (log-odds).</p>
     ${r.warning?`<div class="warn">${esc(r.warning)}</div>`:""}
-    <p class="small">${r.inputs_provided} dari ${r.inputs_total} fitur diisi. Fitur turunan (rasio, rata-rata skor) dihitung otomatis.</p>`;
+    <p class="fine">${r.inputs_provided} dari ${r.inputs_total} fitur diisi. Rasio dan rata-rata skor dihitung otomatis.</p>
+    <details><summary>Lihat permintaan dan respons API</summary>
+      <pre>${esc("POST /predict\n"+JSON.stringify(payload,null,2)+"\n\n"+JSON.stringify(r,null,2))}</pre></details>`;
+  $("mini-p").textContent=`${pct}%`; $("mini-t").textContent=`Kelompok ${t[0]}`; $("mini").classList.add("on");
 }
 
-f.addEventListener("submit", async e=>{
-  e.preventDefault(); go.disabled=true; go.textContent="Menghitung...";
+async function update(){
+  const payload=buildPayload();
+  if(!Object.keys(payload.features).length){ reset(); return; }
+  const my=++seq;
   try{
-    const res = await fetch("/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(buildPayload())});
-    const data = await res.json();
-    if(!res.ok) throw new Error(typeof data.detail==="string"?data.detail:"Input tidak valid");
-    render(data);
-  }catch(err){ out.innerHTML=`<div class="err">Gagal: ${esc(err.message)}</div>`; }
-  finally{ go.disabled=false; go.textContent="Hitung risiko"; }
+    const res=await fetch("/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    const data=await res.json();
+    if(my!==seq) return;
+    if(!res.ok) throw new Error(typeof data.detail==="string"?data.detail:"Ada isian yang tidak valid");
+    render(data,payload);
+  }catch(err){
+    if(my!==seq) return;
+    $("body").innerHTML=`<div class="err">Tidak bisa menghitung: ${esc(err.message)}. Periksa isian lalu coba lagi.</div>`;
+  }
+}
+const schedule=()=>{ clearTimeout(timer); timer=setTimeout(update,280); };
+
+/* slider dan kolom angka saling sinkron */
+f.querySelectorAll("input[type=range]").forEach(r=>{
+  const n=f.elements[r.dataset.for];
+  r.addEventListener("input",()=>{ n.value=r.value; });
+  n.addEventListener("input",()=>{ if(n.value!=="") r.value=n.value; });
 });
+f.addEventListener("input",schedule);
+f.addEventListener("change",schedule);
+
+function fill(p){
+  f.reset();
+  for(const [k,v] of Object.entries(p)){ if(f.elements[k]) f.elements[k].value=v; }
+  f.querySelectorAll("input[type=range]").forEach(r=>{ const v=f.elements[r.dataset.for].value; r.value=v===""?0.5:v; });
+}
+document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>{
+  const k=b.dataset.preset;
+  if(k==="clear"){ f.reset(); f.querySelectorAll("input[type=range]").forEach(r=>r.value=0.5); seq++; reset(); }
+  else{ fill(PRESETS[k]); update(); }
+}));
 </script>
 </body>
 </html>
