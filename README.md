@@ -1,16 +1,18 @@
 # Prediksi Risiko Kredit (Home Credit Default Risk)
 
+**Demo:** [creditriskcounter.onrender.com](https://creditriskcounter.onrender.com)
+
 Project machine learning tabular end-to-end untuk memprediksi nasabah yang berpotensi gagal bayar, memakai dataset [Home Credit Default Risk](https://www.kaggle.com/competitions/home-credit-default-risk) dari Kaggle. Cakupannya: data multi-tabel di PostgreSQL, fitur agregat lewat SQL, kelas tidak seimbang, perbandingan model, tuning Optuna, penjelasan SHAP, kebijakan keputusan berbasis nilai finansial, dan API prediksi (FastAPI + Docker).
 
 ## Hasil utama
 
 Model final: LightGBM hasil tuning, **tanpa** atribut `code_gender`, dievaluasi pada test set (46.127 nasabah, tidak disentuh selama pemilihan model).
 
-| Metrik (test) | Nilai |
-|---|---|
-| ROC-AUC | 0,7893 |
+| Metrik (test)             | Nilai  |
+| ------------------------- | ------ |
+| ROC-AUC                   | 0,7893 |
 | PR-AUC (baseline = 0,081) | 0,2822 |
-| Brier score | 0,0659 |
+| Brier score               | 0,0659 |
 
 - Probabilitas terkalibrasi, sehingga bisa langsung dipakai untuk keputusan berbasis nilai finansial.
 - Pada model dengan `code_gender` (ROC-AUC 0,7913), 30% nasabah berisiko tertinggi memuat sekitar 70% dari semua gagal bayar.
@@ -18,13 +20,13 @@ Model final: LightGBM hasil tuning, **tanpa** atribut `code_gender`, dievaluasi 
 
 ### Perbandingan model (validation set)
 
-| Model | Penanganan imbalance | ROC-AUC | PR-AUC |
-|---|---|---|---|
-| LightGBM | tanpa bobot | 0,7844 | 0,2829 |
-| XGBoost | scale_pos_weight | 0,7835 | 0,2766 |
-| LightGBM | scale_pos_weight | 0,7833 | 0,2781 |
-| Logistic Regression | class_weight | 0,7712 | 0,2580 |
-| Random Forest | class_weight | 0,7658 | 0,2490 |
+| Model               | Penanganan imbalance | ROC-AUC | PR-AUC |
+| ------------------- | -------------------- | ------- | ------ |
+| LightGBM            | tanpa bobot          | 0,7844  | 0,2829 |
+| XGBoost             | scale_pos_weight     | 0,7835  | 0,2766 |
+| LightGBM            | scale_pos_weight     | 0,7833  | 0,2781 |
+| Logistic Regression | class_weight         | 0,7712  | 0,2580 |
+| Random Forest       | class_weight         | 0,7658  | 0,2490 |
 
 Pembobotan kelas tidak memperbaiki ROC-AUC dan tidak dibutuhkan untuk peringkat risiko. Tanpa pembobotan, probabilitas tetap terkalibrasi.
 
@@ -47,16 +49,16 @@ Python, pandas, scikit-learn, XGBoost, LightGBM, Optuna, SHAP, PostgreSQL + SQL,
 
 Home Credit Default Risk (Kaggle), 8 tabel:
 
-| Tabel | Jumlah baris |
-|---|---|
-| application_train | 307.511 |
-| application_test | 48.744 |
-| bureau | 1.716.428 |
-| bureau_balance | 27.299.925 |
-| previous_application | 1.670.214 |
-| pos_cash_balance | 10.001.358 |
-| installments_payments | 13.605.401 |
-| credit_card_balance | 3.840.312 |
+| Tabel                 | Jumlah baris |
+| --------------------- | ------------ |
+| application_train     | 307.511      |
+| application_test      | 48.744       |
+| bureau                | 1.716.428    |
+| bureau_balance        | 27.299.925   |
+| previous_application  | 1.670.214    |
+| pos_cash_balance      | 10.001.358   |
+| installments_payments | 13.605.401   |
+| credit_card_balance   | 3.840.312    |
 
 Data mentah **tidak** disertakan. Unduh dari halaman kompetisi Kaggle dan ekstrak ke `data/raw/`.
 
@@ -171,7 +173,7 @@ Respons berisi probabilitas gagal bayar, kelompok risiko (A sampai D), keputusan
 
 ## Hosting
 
-Image Docker membaca port dari variabel `PORT` (default 8000), jadi bisa langsung dipakai di Render, Railway, atau Cloud Run. Contoh di Render: *New > Web Service*, hubungkan repositori GitHub, pilih runtime **Docker**, plan Free. Halaman web dan API tersedia di satu URL. Plan gratis akan tidur saat tidak dipakai, sehingga permintaan pertama bisa lambat.
+Image Docker membaca port dari variabel `PORT` (default 8000), jadi bisa langsung dipakai di Render, Railway, atau Cloud Run. Contoh di Render: _New > Web Service_, hubungkan repositori GitHub, pilih runtime **Docker**, plan Free. Halaman web dan API tersedia di satu URL. Plan gratis akan tidur saat tidak dipakai, sehingga permintaan pertama bisa lambat.
 
 ## Keterbatasan
 
