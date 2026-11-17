@@ -1,0 +1,48 @@
+{
+  "best_params": {
+    "learning_rate": 0.023213133628180387,
+    "num_leaves": 34,
+    "min_child_samples": 67,
+    "subsample": 0.6759497725351191,
+    "colsample_bytree": 0.41922889357114795,
+    "reg_alpha": 0.08811823404294981,
+    "reg_lambda": 2.7723362270409555
+  },
+  "cv_roc_auc_best": 0.7851128104852267,
+  "n_trials": 30,
+  "n_trees": 1253,
+  "metrics": [
+    {
+      "model": "LightGBM tanpa tuning",
+      "data": "valid",
+      "roc_auc": 0.7844,
+      "pr_auc": 0.2829,
+      "brier": 0.0659,
+      "pohon": 571
+    },
+    {
+      "model": "LightGBM tanpa tuning",
+      "data": "test",
+      "roc_auc": 0.7882,
+      "pr_auc": 0.2829,
+      "brier": 0.0659,
+      "pohon": 571
+    },
+    {
+      "model": "LightGBM hasil tuning",
+      "data": "valid",
+      "roc_auc": 0.7885,
+      "pr_auc": 0.286,
+      "brier": 0.0657,
+      "pohon": 1253
+    },
+    {
+      "model": "LightGBM hasil tuning",
+      "data": "test",
+      "roc_auc": 0.7913,
+      "pr_auc": 0.2845,
+      "brier": 0.0657,
+      "pohon": 1253
+    }
+  ]
+}
