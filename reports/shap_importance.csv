@@ -1,0 +1,166 @@
+,mean_abs_shap,persen,arah
+ext_source_mean,0.3104,8.42,nilai tinggi -> risiko turun
+ext_source_2,0.1122,3.04,nilai tinggi -> risiko turun
+ext_source_3,0.1108,3.0,nilai tinggi -> risiko turun
+code_gender,0.1081,2.93,kategori
+credit_term_months,0.0976,2.65,nilai tinggi -> risiko turun
+ext_source_1,0.0949,2.58,nilai tinggi -> risiko turun
+credit_goods_ratio,0.0929,2.52,nilai tinggi -> risiko naik
+organization_type,0.0888,2.41,kategori
+amt_annuity,0.0835,2.26,nilai tinggi -> risiko naik
+prev_avg_credit_to_application,0.0815,2.21,nilai tinggi -> risiko naik
+prev_avg_cnt_payment,0.0802,2.18,nilai tinggi -> risiko naik
+inst_n_late_last_year,0.0736,2.0,nilai tinggi -> risiko naik
+bureau_debt_credit_ratio,0.0707,1.92,nilai tinggi -> risiko naik
+prev_avg_annuity,0.0694,1.88,nilai tinggi -> risiko turun
+own_car_age,0.0679,1.84,nilai tinggi -> risiko naik
+pos_avg_cnt_instalment,0.0634,1.72,nilai tinggi -> risiko naik
+name_education_type,0.0628,1.7,kategori
+pos_n_months,0.0609,1.65,nilai tinggi -> risiko turun
+pos_latest_month,0.0597,1.62,nilai tinggi -> risiko turun
+name_family_status,0.058,1.57,kategori
+inst_total_paid,0.0563,1.53,nilai tinggi -> risiko turun
+inst_late_share,0.0534,1.45,nilai tinggi -> risiko naik
+inst_max_days_late,0.0499,1.35,nilai tinggi -> risiko naik
+occupation_type,0.0476,1.29,kategori
+bureau_newest_days_credit,0.0465,1.26,nilai tinggi -> risiko naik
+bureau_max_overdue,0.0445,1.21,nilai tinggi -> risiko naik
+days_id_publish,0.0442,1.2,nilai tinggi -> risiko naik
+inst_n_payments,0.0438,1.19,nilai tinggi -> risiko turun
+employed_years,0.043,1.17,nilai tinggi -> risiko turun
+annuity_income_ratio,0.0428,1.16,nilai tinggi -> risiko naik
+prev_refused_share,0.0422,1.14,nilai tinggi -> risiko naik
+days_birth,0.0409,1.11,nilai tinggi -> risiko naik
+bureau_n_active,0.0389,1.06,nilai tinggi -> risiko naik
+amt_goods_price,0.0383,1.04,nilai tinggi -> risiko turun
+inst_paid_ratio,0.037,1.0,nilai tinggi -> risiko turun
+bureau_credit_sum,0.0344,0.93,nilai tinggi -> risiko turun
+prev_sum_credit_approved,0.0336,0.91,nilai tinggi -> risiko naik
+cc_avg_drawings_atm,0.0333,0.9,nilai tinggi -> risiko naik
+bureau_debt_sum,0.0313,0.85,nilai tinggi -> risiko naik
+employed_to_age_ratio,0.0309,0.84,nilai tinggi -> risiko turun
+flag_document_3,0.0307,0.83,nilai tinggi -> risiko naik
+bureau_avg_days_credit,0.0294,0.8,nilai tinggi -> risiko naik
+age_years,0.0292,0.79,nilai tinggi -> risiko turun
+inst_total_due,0.0281,0.76,nilai tinggi -> risiko turun
+region_population_relative,0.0271,0.74,nilai tinggi -> risiko naik
+prev_last_days_decision,0.0265,0.72,nilai tinggi -> risiko naik
+flag_work_phone,0.0256,0.69,nilai tinggi -> risiko naik
+amt_credit,0.0253,0.69,nilai tinggi -> risiko naik
+weekday_appr_process_start,0.0246,0.67,kategori
+cc_avg_utilization,0.0228,0.62,nilai tinggi -> risiko naik
+region_rating_client_w_city,0.0218,0.59,nilai tinggi -> risiko naik
+def_30_cnt_social_circle,0.0208,0.57,nilai tinggi -> risiko naik
+amt_req_credit_bureau_qrt,0.0194,0.53,nilai tinggi -> risiko turun
+days_registration,0.019,0.52,nilai tinggi -> risiko naik
+prev_n_approved,0.0178,0.48,nilai tinggi -> risiko naik
+days_last_phone_change,0.0172,0.47,nilai tinggi -> risiko naik
+credit_income_ratio,0.0169,0.46,nilai tinggi -> risiko naik
+inst_avg_days_late,0.0164,0.44,nilai tinggi -> risiko naik
+cc_avg_drawings,0.0162,0.44,nilai tinggi -> risiko naik
+prev_first_days_decision,0.016,0.43,nilai tinggi -> risiko naik
+prev_n_revolving,0.0157,0.43,nilai tinggi -> risiko naik
+reg_city_not_live_city,0.0151,0.41,nilai tinggi -> risiko naik
+name_income_type,0.0151,0.41,kategori
+days_employed,0.0147,0.4,nilai tinggi -> risiko naik
+prev_n_cash,0.0146,0.4,nilai tinggi -> risiko naik
+cc_avg_limit,0.0144,0.39,nilai tinggi -> risiko turun
+prev_avg_amt_credit,0.0143,0.39,nilai tinggi -> risiko naik
+bureau_oldest_days_credit,0.014,0.38,lemah / tidak monoton
+prev_n_refused,0.0139,0.38,nilai tinggi -> risiko naik
+cc_max_balance,0.0136,0.37,nilai tinggi -> risiko naik
+prev_avg_rate_down_payment,0.0131,0.36,nilai tinggi -> risiko turun
+bureau_bb_n_months,0.0131,0.35,nilai tinggi -> risiko turun
+years_beginexpluatation_avg,0.0127,0.34,nilai tinggi -> risiko turun
+bureau_n_closed,0.0125,0.34,nilai tinggi -> risiko turun
+def_60_cnt_social_circle,0.0123,0.33,nilai tinggi -> risiko naik
+flag_own_car,0.0118,0.32,kategori
+apartments_avg,0.0108,0.29,nilai tinggi -> risiko turun
+hour_appr_process_start,0.0106,0.29,nilai tinggi -> risiko turun
+bureau_bb_dpd_share,0.0103,0.28,nilai tinggi -> risiko naik
+amt_req_credit_bureau_year,0.0102,0.28,nilai tinggi -> risiko turun
+income_per_person,0.009,0.25,nilai tinggi -> risiko naik
+inst_n_loans,0.0089,0.24,nilai tinggi -> risiko naik
+amt_income_total,0.0087,0.24,nilai tinggi -> risiko naik
+commonarea_avg,0.0087,0.23,lemah / tidak monoton
+name_contract_type,0.0084,0.23,kategori
+prev_avg_amt_application,0.0082,0.22,nilai tinggi -> risiko turun
+landarea_avg,0.0082,0.22,nilai tinggi -> risiko turun
+nonlivingapartments_avg,0.008,0.22,nilai tinggi -> risiko naik
+cc_avg_balance,0.0079,0.21,nilai tinggi -> risiko naik
+livingarea_avg,0.0079,0.21,nilai tinggi -> risiko turun
+entrances_avg,0.0077,0.21,nilai tinggi -> risiko turun
+region_rating_client,0.0076,0.21,nilai tinggi -> risiko naik
+flag_phone,0.0074,0.2,nilai tinggi -> risiko turun
+years_build_avg,0.0074,0.2,nilai tinggi -> risiko naik
+bureau_n_credits,0.0073,0.2,nilai tinggi -> risiko naik
+floorsmax_avg,0.0073,0.2,nilai tinggi -> risiko turun
+basementarea_avg,0.0072,0.19,nilai tinggi -> risiko naik
+prev_n_apps,0.0071,0.19,nilai tinggi -> risiko naik
+inst_sum_shortfall,0.0071,0.19,nilai tinggi -> risiko naik
+name_type_suite,0.0067,0.18,kategori
+livingapartments_avg,0.0064,0.17,nilai tinggi -> risiko turun
+pos_n_loans,0.0062,0.17,nilai tinggi -> risiko naik
+name_housing_type,0.0062,0.17,kategori
+cc_avg_payment_total,0.0058,0.16,nilai tinggi -> risiko turun
+obs_60_cnt_social_circle,0.0054,0.15,nilai tinggi -> risiko turun
+bureau_bb_n_dpd,0.0052,0.14,lemah / tidak monoton
+inst_n_underpaid,0.0052,0.14,nilai tinggi -> risiko naik
+nonlivingarea_avg,0.0052,0.14,lemah / tidak monoton
+pos_dpd_share,0.005,0.14,nilai tinggi -> risiko naik
+elevators_avg,0.0047,0.13,nilai tinggi -> risiko turun
+inst_n_late,0.0047,0.13,nilai tinggi -> risiko naik
+cc_avg_min_regularity,0.0046,0.12,nilai tinggi -> risiko turun
+obs_30_cnt_social_circle,0.0045,0.12,nilai tinggi -> risiko turun
+cc_n_months,0.0042,0.11,lemah / tidak monoton
+pos_max_dpd,0.0042,0.11,nilai tinggi -> risiko naik
+cnt_fam_members,0.004,0.11,nilai tinggi -> risiko turun
+flag_own_realty,0.004,0.11,kategori
+prev_n_consumer,0.0038,0.1,nilai tinggi -> risiko turun
+floorsmin_avg,0.0037,0.1,nilai tinggi -> risiko turun
+bureau_n_credit_types,0.0034,0.09,lemah / tidak monoton
+pos_n_dpd_months,0.0033,0.09,nilai tinggi -> risiko turun
+pos_avg_dpd,0.0031,0.08,nilai tinggi -> risiko naik
+flag_document_8,0.003,0.08,nilai tinggi -> risiko turun
+flag_document_16,0.0029,0.08,nilai tinggi -> risiko turun
+bureau_overdue_sum,0.0027,0.07,nilai tinggi -> risiko naik
+live_city_not_work_city,0.0027,0.07,nilai tinggi -> risiko turun
+cnt_children,0.0026,0.07,nilai tinggi -> risiko naik
+prev_n_canceled,0.0024,0.06,nilai tinggi -> risiko turun
+flag_document_18,0.0024,0.06,nilai tinggi -> risiko turun
+bureau_bb_worst_status,0.0021,0.06,nilai tinggi -> risiko naik
+flag_document_6,0.0019,0.05,nilai tinggi -> risiko naik
+cc_max_dpd,0.0015,0.04,nilai tinggi -> risiko naik
+amt_req_credit_bureau_mon,0.0015,0.04,lemah / tidak monoton
+cc_n_dpd_months,0.0015,0.04,nilai tinggi -> risiko turun
+reg_city_not_work_city,0.0009,0.02,nilai tinggi -> risiko naik
+bureau_n_prolong,0.0009,0.02,nilai tinggi -> risiko naik
+amt_req_credit_bureau_day,0.0008,0.02,nilai tinggi -> risiko naik
+reg_region_not_work_region,0.0007,0.02,nilai tinggi -> risiko turun
+live_region_not_work_region,0.0007,0.02,nilai tinggi -> risiko turun
+bureau_max_day_overdue,0.0006,0.01,lemah / tidak monoton
+flag_document_13,0.0004,0.01,lemah / tidak monoton
+amt_req_credit_bureau_week,0.0004,0.01,lemah / tidak monoton
+cc_n_cards,0.0004,0.01,nilai tinggi -> risiko naik
+flag_document_5,0.0002,0.01,nilai tinggi -> risiko naik
+flag_email,0.0002,0.01,nilai tinggi -> risiko naik
+reg_region_not_live_region,0.0002,0.0,nilai tinggi -> risiko turun
+flag_cont_mobile,0.0002,0.0,lemah / tidak monoton
+flag_document_11,0.0002,0.0,nilai tinggi -> risiko turun
+bureau_n_overdue,0.0001,0.0,nilai tinggi -> risiko naik
+amt_req_credit_bureau_hour,0.0001,0.0,nilai tinggi -> risiko naik
+flag_mobil,0.0,0.0,lemah / tidak monoton
+flag_emp_phone,0.0,0.0,lemah / tidak monoton
+flag_document_12,0.0,0.0,lemah / tidak monoton
+flag_document_17,0.0,0.0,lemah / tidak monoton
+flag_document_15,0.0,0.0,lemah / tidak monoton
+flag_document_14,0.0,0.0,lemah / tidak monoton
+flag_document_20,0.0,0.0,lemah / tidak monoton
+flag_document_4,0.0,0.0,lemah / tidak monoton
+flag_document_2,0.0,0.0,lemah / tidak monoton
+flag_document_7,0.0,0.0,lemah / tidak monoton
+flag_document_9,0.0,0.0,lemah / tidak monoton
+flag_document_10,0.0,0.0,lemah / tidak monoton
+flag_document_21,0.0,0.0,lemah / tidak monoton
+flag_document_19,0.0,0.0,lemah / tidak monoton
+days_employed_anomaly,0.0,0.0,lemah / tidak monoton
