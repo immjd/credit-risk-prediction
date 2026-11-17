@@ -113,17 +113,43 @@ def features():
     return {"numeric": [c for c in FEATURES if c not in CAT_COLS], "categorical": sorted(CAT_COLS)}
 
 
+# Fitur yang berasal dari sumber yang sama digabung menjadi satu alasan (kontribusi log-odds dijumlahkan).
+REASON_GROUPS = {
+    "ext_source (skor kredit eksternal)": ["ext_source_1", "ext_source_2", "ext_source_3", "ext_source_mean"],
+}
+
+
+def top_reasons(df, contrib, k=3):
+    """k alasan teratas yang menaikkan risiko, hanya dari fitur yang terisi; fitur sekelompok digabung."""
+    member_of = {f: g for g, members in REASON_GROUPS.items() for f in members}
+    items = {}
+    for i, f in enumerate(FEATURES):
+        v = df.iloc[0, i]
+        if pd.isna(v):
+            continue
+        v = v.item() if hasattr(v, "item") else v
+        key = member_of.get(f, f)
+        item = items.setdefault(key, {"feature": key, "values": {}, "contribution_log_odds": 0.0})
+        item["values"][f] = v
+        item["contribution_log_odds"] += float(contrib[i])
+    out = []
+    for item in sorted(items.values(), key=lambda x: -x["contribution_log_odds"])[:k]:
+        if item["contribution_log_odds"] <= 0:
+            continue
+        vals = item["values"]
+        out.append({"feature": item["feature"],
+                    "value": next(iter(vals.values())) if len(vals) == 1 and item["feature"] in vals else vals,
+                    "contribution_log_odds": round(item["contribution_log_odds"], 3)})
+    return out
+
+
 @app.post("/predict")
 def predict(applicant: Applicant):
     provided = {k: v for k, v in applicant.features.items() if v is not None}
     df = to_frame(derive(applicant.features))
     p = float(booster.predict(df)[0])
     contrib = booster.predict(df, pred_contrib=True)[0][:-1]  # log-odds; kolom terakhir = bias
-    order = np.argsort(contrib)[::-1][:3]
-    reasons = [{"feature": FEATURES[i], "value": None if pd.isna(df.iloc[0, i]) else df.iloc[0, i].item()
-                if hasattr(df.iloc[0, i], "item") else df.iloc[0, i],
-                "contribution_log_odds": round(float(contrib[i]), 3)}
-               for i in order if contrib[i] > 0 and not pd.isna(df.iloc[0, i])]
+    reasons = top_reasons(df, contrib)
     approve = p < THRESHOLD
     warning = None
     if len(provided) < MIN_INPUTS:
