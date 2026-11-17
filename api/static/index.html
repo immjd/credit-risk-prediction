@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulasi Risiko Kredit</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#fff; --text:#1c2430; --muted:#5d6978; --line:#dfe3e8;
+  --accent:#1f5fbf; --accent-text:#fff;
+  --A:#b42318; --B:#b54708; --C:#8a6d00; --D:#0a7a4b;
+  --Abg:#fdecea; --Bbg:#fdf0e1; --Cbg:#fbf3d0; --Dbg:#e4f5ec;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161c; --card:#1a2029; --text:#e6e9ee; --muted:#9aa5b4; --line:#2a323d;
+    --accent:#6ea2f0; --accent-text:#0b1220;
+    --A:#ff8a80; --B:#ffb870; --C:#e8cd5a; --D:#6fd6a3;
+    --Abg:#3a1f1d; --Bbg:#3a2a18; --Cbg:#37300f; --Dbg:#163326;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+fieldset{border:0;margin:0 0 14px;padding:0}
+legend{font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:8px;padding:0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:480px){.row{grid-template-columns:1fr}}
+label{display:block;font-size:13px;color:var(--muted)}
+input,select{width:100%;margin-top:3px;padding:8px 9px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);font:inherit}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+button{font:inherit;border-radius:7px;padding:8px 12px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer}
+button.primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent);font-weight:600}
+button:disabled{opacity:.6;cursor:wait}
+.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
+.result-empty{color:var(--muted)}
+.prob{font-size:40px;font-weight:700;line-height:1.1}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:600;font-size:13px;border:1px solid currentColor}
+.t-A{color:var(--A);background:var(--Abg)} .t-B{color:var(--B);background:var(--Bbg)}
+.t-C{color:var(--C);background:var(--Cbg)} .t-D{color:var(--D);background:var(--Dbg)}
+.decision{margin:10px 0;font-weight:600}
+.scale{position:relative;height:12px;display:flex;margin:14px 0 4px}
+.scale span{display:block;height:100%}
+.scale span:first-child{border-radius:6px 0 0 6px}
+.scale span:nth-child(4){border-radius:0 6px 6px 0}
+.marker{position:absolute;top:-4px;width:3px;height:20px;background:var(--text);border-radius:2px}
+.legend{display:flex;font-size:11px;color:var(--muted)}
+.legend span{text-align:center;overflow:hidden;white-space:nowrap}
+ul.reasons{padding-left:18px;margin:6px 0}
+ul.reasons li{margin:4px 0}
+.small{font-size:12px;color:var(--muted)}
+.warn{background:var(--Bbg);color:var(--B);padding:8px 10px;border-radius:7px;font-size:13px;margin:10px 0}
+.err{background:var(--Abg);color:var(--A);padding:8px 10px;border-radius:7px;font-size:13px}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Simulasi Risiko Kredit</h1>
+  <p class="sub">Model LightGBM pada data Home Credit Default Risk. Isi data pemohon, lihat probabilitas gagal bayar, kelompok risiko, dan faktor pendorongnya.</p>
+
+  <div class="grid">
+    <form id="f" class="card" autocomplete="off">
+      <div class="presets">
+        <button type="button" data-preset="low">Contoh risiko rendah</button>
+        <button type="button" data-preset="high">Contoh risiko tinggi</button>
+        <button type="button" data-preset="clear">Kosongkan</button>
+      </div>
+
+      <fieldset><legend>Pinjaman</legend>
+        <div class="row">
+          <label>Jenis kontrak
+            <select name="name_contract_type"><option value="">(kosong)</option><option>Cash loans</option><option>Revolving loans</option></select></label>
+          <label>Jumlah kredit<input type="number" step="any" min="0" name="amt_credit"></label>
+          <label>Cicilan per periode (annuity)<input type="number" step="any" min="0" name="amt_annuity"></label>
+          <label>Harga barang<input type="number" step="any" min="0" name="amt_goods_price"></label>
+        </div>
+      </fieldset>
+
+      <fieldset><legend>Pemohon</legend>
+        <div class="row">
+          <label>Penghasilan total (per tahun)<input type="number" step="any" min="0" name="amt_income_total"></label>
+          <label>Umur (tahun)<input type="number" step="any" min="18" max="100" name="age_years"></label>
+          <label>Lama bekerja (tahun)<input type="number" step="any" min="0" max="80" name="years_employed"></label>
+          <label>Jumlah anggota keluarga<input type="number" step="1" min="1" name="cnt_fam_members"></label>
+          <label>Pendidikan
+            <select name="name_education_type"><option value="">(kosong)</option>
+              <option>Lower secondary</option><option>Secondary / secondary special</option>
+              <option>Incomplete higher</option><option>Higher education</option><option>Academic degree</option></select></label>
+          <label>Jenis penghasilan
+            <select name="name_income_type"><option value="">(kosong)</option>
+              <option>Working</option><option>Commercial associate</option><option>State servant</option>
+              <option>Pensioner</option><option>Unemployed</option><option>Student</option><option>Businessman</option></select></label>
+        </div>
+      </fieldset>
+
+      <fieldset><legend>Skor kredit eksternal (0 sampai 1)</legend>
+        <div class="row">
+          <label>Skor 1<input type="number" step="0.01" min="0" max="1" name="ext_source_1"></label>
+          <label>Skor 2<input type="number" step="0.01" min="0" max="1" name="ext_source_2"></label>
+          <label>Skor 3<input type="number" step="0.01" min="0" max="1" name="ext_source_3"></label>
+        </div>
+      </fieldset>
+
+      <fieldset><legend>Riwayat kredit (opsional)</legend>
+        <div class="row">
+          <label>Cicilan terlambat, setahun terakhir (kali)<input type="number" step="1" min="0" name="inst_n_late_last_year"></label>
+          <label>Pengajuan sebelumnya ditolak (kali)<input type="number" step="1" min="0" name="prev_n_refused"></label>
+          <label>Rasio utang terhadap kredit di lembaga lain<input type="number" step="any" min="0" name="bureau_debt_credit_ratio"></label>
+          <label>Total tunggakan di lembaga lain<input type="number" step="any" min="0" name="bureau_overdue_sum"></label>
+        </div>
+        <p class="hint">Kolom yang dikosongkan dianggap "tidak ada data", dan model memperlakukannya sebagai nasabah tanpa riwayat tersebut.</p>
+      </fieldset>
+
+      <button class="primary" type="submit" id="go">Hitung risiko</button>
+    </form>
+
+    <div class="card" id="out" aria-live="polite">
+      <div class="result-empty">Hasil akan tampil di sini. Coba tombol contoh di kiri atas.</div>
+    </div>
+  </div>
+
+  <p class="small" style="margin-top:20px">
+    Ini demo portofolio, bukan alat keputusan kredit. Keputusan memakai asumsi finansial ilustrasi (untung 10%, rugi 60%), dan faktor risiko menjelaskan perilaku model, bukan sebab-akibat.
+    Form ini hanya mengisi sebagian dari 164 fitur model. Dokumentasi API: <a href="/docs">/docs</a>.
+  </p>
+</div>
+
+<script>
+const PRESETS = {
+  low: {name_contract_type:"Cash loans",amt_income_total:270000,amt_credit:400000,amt_annuity:18000,amt_goods_price:400000,
+        age_years:43.8,years_employed:9.6,cnt_fam_members:2,name_education_type:"Higher education",name_income_type:"Working",
+        ext_source_1:0.7,ext_source_2:0.75,ext_source_3:0.72},
+  high:{name_contract_type:"Cash loans",amt_income_total:90000,amt_credit:900000,amt_annuity:45000,amt_goods_price:700000,
+        age_years:26,years_employed:0.55,cnt_fam_members:4,name_education_type:"Secondary / secondary special",name_income_type:"Working",
+        ext_source_1:0.1,ext_source_2:0.15,ext_source_3:0.12,inst_n_late_last_year:5,prev_n_refused:2}
+};
+const LABELS = {
+  "ext_source (skor kredit eksternal)":"Skor kredit eksternal rendah",
+  credit_goods_ratio:"Kredit melebihi harga barang", amt_annuity:"Cicilan besar",
+  credit_income_ratio:"Kredit besar dibanding penghasilan", annuity_income_ratio:"Cicilan besar dibanding penghasilan",
+  credit_term_months:"Tenor pendek", inst_n_late_last_year:"Cicilan terlambat setahun terakhir",
+  inst_late_share:"Proporsi cicilan terlambat", bureau_debt_credit_ratio:"Rasio utang di lembaga lain tinggi",
+  bureau_overdue_sum:"Tunggakan di lembaga lain", prev_n_refused:"Pengajuan sebelumnya ditolak",
+  age_years:"Umur muda", employed_years:"Masa kerja singkat", name_education_type:"Tingkat pendidikan",
+  name_income_type:"Jenis penghasilan", amt_goods_price:"Harga barang", amt_credit:"Jumlah kredit"
+};
+const f = document.getElementById("f"), out = document.getElementById("out"), go = document.getElementById("go");
+let cuts = null;
+
+fetch("/model-info").then(r=>r.json()).then(m=>{cuts=m.tier_cutoffs;}).catch(()=>{});
+
+function fill(p){ f.reset(); for(const [k,v] of Object.entries(p)){ if(f.elements[k]) f.elements[k].value=v; } }
+document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>{
+  const k=b.dataset.preset; if(k==="clear"){f.reset();out.innerHTML='<div class="result-empty">Hasil akan tampil di sini.</div>';} else {fill(PRESETS[k]); f.requestSubmit();}
+}));
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function fmt(v){return typeof v==="number" ? (Number.isInteger(v)?v:v.toFixed(3).replace(/0+$/,"").replace(/\.$/,"")) : esc(v);}
+
+function buildPayload(){
+  const feats = {};
+  for(const el of f.elements){
+    if(!el.name || el.value==="") continue;
+    const isNum = el.type==="number"; feats[el.name] = isNum ? Number(el.value) : el.value;
+  }
+  if("age_years" in feats){ feats.days_birth = -Math.round(feats.age_years*365.25); delete feats.age_years; }
+  if("years_employed" in feats){ feats.days_employed = -Math.round(feats.years_employed*365.25); delete feats.years_employed; }
+  return {features: feats};
+}
+
+function render(r){
+  const pct = (r.default_probability*100).toFixed(1);
+  const names = {A:"Sangat tinggi",B:"Tinggi",C:"Sedang",D:"Rendah"};
+  const dec = r.decision==="approve" ? "Disetujui menurut kebijakan model" : "Perlu tinjauan manual atau ditolak";
+  let scale = "";
+  if(cuts){
+    const max = 0.4, w = x=>Math.min(x,max)/max*100;
+    const segs = [[0,cuts.D_max,"var(--D)"],[cuts.D_max,cuts.C_max,"var(--C)"],[cuts.C_max,cuts.B_max,"var(--B)"],[cuts.B_max,max,"var(--A)"]];
+    scale = '<div class="scale">'+segs.map(s=>`<span style="width:${w(s[1])-w(s[0])}%;background:${s[2]}"></span>`).join("")+
+      `<i class="marker" style="left:calc(${w(r.default_probability)}% - 1px)"></i></div>
+       <div class="legend">`+segs.map((s,i)=>`<span style="width:${w(s[1])-w(s[0])}%">${"DCBA"[i]}</span>`).join("")+`</div>
+       <div class="small">Skala sampai 40%; di atas itu penanda berada di ujung kanan.</div>`;
+  }
+  const reasons = r.top_risk_factors.length ? '<ul class="reasons">'+r.top_risk_factors.map(x=>{
+    const v = typeof x.value==="object" && x.value!==null
+      ? Object.entries(x.value).map(([k,val])=>`${esc(k)}: ${fmt(val)}`).join(", ") : fmt(x.value);
+    return `<li><strong>${esc(LABELS[x.feature]||x.feature)}</strong><br><span class="small">${v} (kontribusi ${x.contribution_log_odds} log-odds)</span></li>`;
+  }).join("")+"</ul>" : '<p class="small">Tidak ada faktor yang menaikkan risiko dari data yang diisi.</p>';
+  out.innerHTML = `
+    <div class="small">Probabilitas gagal bayar</div>
+    <div class="prob">${pct}%</div>
+    <span class="badge t-${r.risk_tier}">Kelompok ${r.risk_tier}: ${names[r.risk_tier]}</span>
+    <div class="decision">${dec} <span class="small">(ambang ${(r.decision_threshold*100).toFixed(1)}%)</span></div>
+    ${scale}
+    <h3 style="font-size:14px;margin:16px 0 0">Faktor yang paling menaikkan risiko</h3>${reasons}
+    ${r.warning?`<div class="warn">${esc(r.warning)}</div>`:""}
+    <p class="small">${r.inputs_provided} dari ${r.inputs_total} fitur diisi. Fitur turunan (rasio, rata-rata skor) dihitung otomatis.</p>`;
+}
+
+f.addEventListener("submit", async e=>{
+  e.preventDefault(); go.disabled=true; go.textContent="Menghitung...";
+  try{
+    const res = await fetch("/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(buildPayload())});
+    const data = await res.json();
+    if(!res.ok) throw new Error(typeof data.detail==="string"?data.detail:"Input tidak valid");
+    render(data);
+  }catch(err){ out.innerHTML=`<div class="err">Gagal: ${esc(err.message)}</div>`; }
+  finally{ go.disabled=false; go.textContent="Hitung risiko"; }
+});
+</script>
+</body>
+</html>

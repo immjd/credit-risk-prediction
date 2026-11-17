@@ -12,6 +12,7 @@ import lightgbm as lgb
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 MODEL_DIR = Path(os.getenv("MODEL_DIR", Path(__file__).resolve().parents[1] / "models"))
@@ -24,6 +25,13 @@ THRESHOLD = meta["decision_threshold"]
 MIN_INPUTS = 20  # di bawah ini, beri peringatan bahwa input terlalu sedikit
 
 app = FastAPI(title="Credit Risk API", version="1.0")
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+
+@app.get("/", include_in_schema=False)
+def index():
+    """Halaman web untuk uji coba (api/static/index.html)."""
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 class Applicant(BaseModel):

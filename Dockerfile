@@ -13,4 +13,5 @@ COPY models/lgbm_final.txt models/metadata.json models/
 
 ENV MODEL_DIR=/app/models
 EXPOSE 8000
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Platform hosting (Render, Railway, Cloud Run) memberi port lewat $PORT; lokal default 8000.
+CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

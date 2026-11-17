@@ -84,6 +84,7 @@ credit-risk-project/
 ├── sql/                       # 01-04: pembuatan fitur dan features.model_train
 ├── src/                       # db, loader, data, run_sql, train_final
 ├── api/main.py                # FastAPI
+├── api/static/index.html      # halaman web uji coba
 ├── models/                    # lgbm_final.txt, metadata.json, best_params.json
 ├── reports/                   # business_interpretation.md
 ├── Dockerfile                 # image API
@@ -144,7 +145,7 @@ docker build -t credit-risk-api .
 docker run --rm -p 8000:8000 credit-risk-api
 ```
 
-Dokumentasi interaktif di `http://localhost:8000/docs`. Endpoint: `GET /health`, `GET /model-info`, `GET /features`, `POST /predict`.
+Halaman web uji coba (form, contoh profil, hasil dan faktor risiko) ada di `http://localhost:8000/`. Dokumentasi interaktif API di `http://localhost:8000/docs`. Endpoint: `GET /health`, `GET /model-info`, `GET /features`, `POST /predict`.
 
 Contoh permintaan `POST /predict` (fitur yang tidak diisi dianggap kosong, fitur turunan seperti rasio kredit terhadap pendapatan dan rata-rata skor eksternal dihitung otomatis):
 
@@ -167,6 +168,10 @@ Contoh permintaan `POST /predict` (fitur yang tidak diisi dianggap kosong, fitur
 ```
 
 Respons berisi probabilitas gagal bayar, kelompok risiko (A sampai D), keputusan, tiga faktor risiko teratas, dan peringatan bila fitur yang diisi terlalu sedikit.
+
+## Hosting
+
+Image Docker membaca port dari variabel `PORT` (default 8000), jadi bisa langsung dipakai di Render, Railway, atau Cloud Run. Contoh di Render: *New > Web Service*, hubungkan repositori GitHub, pilih runtime **Docker**, plan Free. Halaman web dan API tersedia di satu URL. Plan gratis akan tidur saat tidak dipakai, sehingga permintaan pertama bisa lambat.
 
 ## Keterbatasan
 
